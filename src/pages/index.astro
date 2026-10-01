@@ -1,0 +1,110 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/scenes.css';
+
+const [document] = await getCollection('manifesto', ({ data }) => !data.draft);
+
+// The manifesto is the site now — one document, one page, no draft fallback.
+const { Content } = await render(document);
+
+const formatDate = (date: Date) =>
+	new Intl.DateTimeFormat('en-GB', {
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric',
+	})
+		.format(date)
+		.replace(/ /g, ' ');
+---
+
+<Base
+	title="A Manifesto for Epistemic Resilience"
+	description={
+		document.data.standfirst ?? 'Epistemic resilience: the ability of an intelligent system to remain correctable.'
+	}
+	heroReveal="split-lines"
+>
+	<Header slot="header" />
+	<Footer slot="footer" />
+
+	<article class="container-page py-24">
+		<div class="sys-rail" data-sys-rail aria-hidden="true">
+			<span class="sys-rail__step" data-sys-rail-step>Information</span>
+			<span class="sys-rail__step" data-sys-rail-step>Claim</span>
+			<span class="sys-rail__step" data-sys-rail-step>Evidence</span>
+			<span class="sys-rail__step" data-sys-rail-step>Interpretation</span>
+			<span class="sys-rail__step" data-sys-rail-step>Decision</span>
+			<span class="sys-rail__step" data-sys-rail-step>Action</span>
+			<span class="sys-rail__step" data-sys-rail-step>Outcome</span>
+			<span class="sys-rail__step" data-sys-rail-step>New evidence</span>
+		</div>
+
+		<header class="max-w-[62ch]">
+			<p
+				class="reveal mb-8 font-mono text-xs tracking-[0.2em] text-accent-strong uppercase"
+				data-reveal="fade-up"
+			>
+				Manifesto
+			</p>
+
+			<h1
+				data-hero
+				class="font-display text-balance text-display"
+			>
+				{document.data.title}
+			</h1>
+
+			{
+				document.data.standfirst && (
+					<p
+						class="standfirst reveal mt-8 text-balance text-lede"
+						data-reveal="fade-up"
+					>
+						{document.data.standfirst}
+					</p>
+				)
+			}
+
+			{
+				document.data.updatedDate && (
+					<p class="mt-10 font-mono text-xs text-soft">
+						Last revised{' '}
+						<time datetime={document.data.updatedDate.toISOString()}>
+							{formatDate(document.data.updatedDate)}
+						</time>
+					</p>
+				)
+			}
+		</header>
+
+		<div class="rule-gradient my-16" aria-hidden="true"></div>
+
+		{/*
+			Prose is styled by `.m-prose` in `src/styles/scenes.css`; section
+			headings carry their own numbers in the source, so they need no
+			decoration. The scene panels (`.sys-scene`) break out of the column
+			to the full viewport and are animated by `src/lib/manifesto/engine.ts`.
+		*/}
+		<div class="m-prose">
+			<Content />
+		</div>
+
+		<div class="rule-gradient my-16" aria-hidden="true"></div>
+
+		<footer class="max-w-[68ch]">
+			<p class="text-sm text-soft">
+				This document is a position, not a settled conclusion. If part of it is
+				wrong, it should be correctable — which is rather the point.
+			</p>
+		</footer>
+	</article>
+</Base>
+
+<script>
+	import { initManifesto } from '../lib/manifesto/engine';
+
+	initManifesto();
+</script>

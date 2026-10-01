@@ -1,0 +1,7 @@
+---
+// The manifesto is rendered at the site root; this path only exists so the
+// old root-relative URL keeps resolving to it.
+const target = `${import.meta.env.BASE_URL}`;
+
+return Astro.redirect(target, 301);
+---
