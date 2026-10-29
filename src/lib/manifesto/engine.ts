@@ -118,8 +118,9 @@ const buildRevision: Builder = (root) => {
 };
 
 const buildOptimize: Builder = (root) => {
-	// No timeline: the "active objective" is real state, so it is driven by
-	// scroll position instead of a scrubbed tween and is reversible both ways.
+	// Use the shared scene timeline and pin trigger. A second ScrollTrigger here
+	// used to pin the same scene twice, which displaced the content and broke
+	// pin/unpin measurements.
 	const cols = root.querySelectorAll<HTMLElement>('[data-opt-col]');
 	const objective = root.querySelector<HTMLElement>('[data-objective]');
 	const blind = root.querySelector<HTMLElement>('[data-blind-spot]');
@@ -130,21 +131,17 @@ const buildOptimize: Builder = (root) => {
 		blind: c.dataset.optBlind ?? '',
 	}));
 
-	ScrollTrigger.create({
-		trigger: root,
-		start: 'top top',
-		end: '+=100%',
-		scrub: true,
-		pin: true,
-		anticipatePin: 1,
-		onUpdate: (self) => {
-			const i = Math.min(cols.length - 1, Math.floor(self.progress * cols.length));
-			cols.forEach((col, k) => col.classList.toggle('sys-opt__col--lit', k === i));
-			objective.textContent = meta[i].label;
-			blind.textContent = meta[i].blind;
-		},
-	});
-	return null; // has its own pin + controller
+	const render = (progress: number) => {
+		const i = Math.min(cols.length - 1, Math.floor(progress * cols.length));
+		cols.forEach((col, k) => col.classList.toggle('sys-opt__col--lit', k === i));
+		objective.textContent = meta[i].label;
+		blind.textContent = meta[i].blind;
+	};
+
+	const timeline = gsap.timeline({ onUpdate: () => render(timeline.progress()) });
+	timeline.to({}, { duration: 1 });
+	render(0);
+	return timeline;
 };
 
 const buildAutomation: Builder = (root) => {
