@@ -8,7 +8,8 @@
  * Under supported conditions each panel remains in normal document flow.
  * Its timeline scrubs between a *calmer* opening and the DOM end state as the
  * panel crosses the viewport — no pin spacers or layout reparenting required.
- * Every timeline is built with `gsap.from`, so the resting state is real CSS.
+ * The DOM remains the readable end state; scroll-linked motion only changes
+ * its presentation while the scene is active.
  *
  * Motion is gated through `gsap.matchMedia()`, the GSAP-recommended way to
  * handle `prefers-reduced-motion`: timelines and triggers are only created for
