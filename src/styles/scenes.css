@@ -646,7 +646,6 @@
 
 .sys-loop__ring { overflow: visible; }
 
-.sys-loop__nodes { pointer-events: none; }
 
 .sys-loop__node {
 	position: absolute;
