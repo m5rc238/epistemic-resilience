@@ -1,10 +1,8 @@
 ---
 import SysScene from './SysScene.astro';
 
-/** The final scene. Six phases of the system become a single closed loop —
- *  the outcome is new evidence. Rendered as nodes on a ring with a persistent
- *  arrow; the whole ring drifts slowly (CSS, killed under reduce-motion),
- *  but nothing here loops as a cheesy spinner — it simply *is* a loop. */
+/** Six phases form a cycle: outcomes become new evidence. The nodes stay
+ *  fixed around a circle, while the explanatory copy sits below it. */
 const ring = [
 	{ kind: 'evidence', label: 'Evidence', top: '10.7%', left: '50%' },
 	{ kind: 'interpretation', label: 'Interpretation', top: '30%', left: '84%' },
@@ -45,7 +43,7 @@ const ring = [
 	</div>
 
 	<div class="sys-loop__center">
-			<span class="sys-node__label">A system that stays connected</span>
-			<p>wrong can surface, decisions can be reconstructed, and the loop can turn again.</p>
+		<span class="sys-node__label">Correction stays possible</span>
+		<p>Errors can surface, decisions can be reconstructed, and outcomes can guide the next cycle.</p>
 	</div>
 </SysScene>
