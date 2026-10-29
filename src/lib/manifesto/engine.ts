@@ -5,13 +5,14 @@
  * is slow, broken, or the visitor prefers reduced motion, the scene is simply
  * read as-is: everything it means to communicate is already on the page.
  *
- * Under supported conditions we pin each panel for one viewport of scroll and
- * scrub a purpose-built timeline between a *calmer* opening and that DOM end
- * state — the "growth → maturity" rhythm the brief asks for. Every timeline
- * is built with `gsap.from`, so the rest state is the real CSS state.
+ * Under supported conditions each panel remains in normal document flow.
+ * Its timeline scrubs between a *calmer* opening and the DOM end state as the
+ * panel crosses the viewport — no pin spacers or layout reparenting required.
+ * The DOM remains the readable end state; scroll-linked motion only changes
+ * its presentation while the scene is active.
  *
  * Motion is gated through `gsap.matchMedia()`, the GSAP-recommended way to
- * handle `prefers-reduced-motion`: pins and timelines are only created for
+ * handle `prefers-reduced-motion`: timelines and triggers are only created for
  * `no-preference`, and are reverted and rebuilt if the preference changes
  * while the reader sits on the page.
  *
@@ -38,9 +39,8 @@ const STAGE_BY_SCENE: Record<string, number> = {
 };
 
 /**
- * Minimal timeline builders. Each receives the scene root and returns either
- * a timeline (scrubbed against the pinned panel) or `null` if the scene has
- * nothing to animate (scrolls naturally).
+ * Timeline builders return a timeline scrubbed while the scene crosses the
+ * viewport, or `null` for interaction-only scenes that scroll naturally.
  */
 type Builder = (root: HTMLElement) => ReturnType<typeof gsap.timeline> | null;
 
@@ -118,9 +118,8 @@ const buildRevision: Builder = (root) => {
 };
 
 const buildOptimize: Builder = (root) => {
-	// Use the shared scene timeline and pin trigger. A second ScrollTrigger here
-	// used to pin the same scene twice, which displaced the content and broke
-	// pin/unpin measurements.
+	// Use the shared scene timeline. A separate ScrollTrigger here duplicated
+	// the scene's scroll lifecycle and caused its state to drift out of sync.
 	const cols = root.querySelectorAll<HTMLElement>('[data-opt-col]');
 	const objective = root.querySelector<HTMLElement>('[data-objective]');
 	const blind = root.querySelector<HTMLElement>('[data-blind-spot]');
@@ -198,7 +197,7 @@ function advance(stage: number): void {
 interface Instance {
 	scene: HTMLElement;
 	stage: number;
-	/** Called on enter so unpinned scenes still advance the rail. */
+	/** Called when the scene trigger becomes active. */
 	onEnter: () => void;
 }
 
@@ -226,7 +225,7 @@ function wireRail(trigger: HTMLElement, stage: number, start: string): void {
 }
 
 /**
- * Build the pinned/scrubbed scenes. Only `prefers-reduced-motion:
+ * Build the scroll-scrubbed scenes without pinning them. Only `prefers-reduced-motion:
  * no-preference` gets this; `gsap.matchMedia()` reverts every trigger and
  * tween created here if the preference flips (and rebuilds them when it
  * comes back) — the GSAP-blessed way to honour reduced motion.
@@ -239,7 +238,7 @@ function buildMotion(nodes: Instance[]): gsap.MatchMedia {
 			const name = scene.dataset.scene ?? '';
 			const builder = BUILDERS[name];
 
-			// Unpinned scenes still mark the rail when scrolled into view.
+			// Scenes without a timeline still mark the rail as they enter view.
 			if (!builder) {
 				wireRail(scene, stage, 'top 65%');
 				return;
@@ -247,25 +246,23 @@ function buildMotion(nodes: Instance[]): gsap.MatchMedia {
 
 			const timeline = builder(scene);
 			if (!timeline) {
-				// Optimize owns its own pin + onUpdate; we only add the rail.
+				// Interaction-only scenes use a simple rail trigger.
 				wireRail(scene, stage, 'top top');
 				return;
 			}
 
 			ScrollTrigger.create({
 				trigger: scene,
-				start: 'top top',
-				end: '+=100%',
+				start: 'top 80%',
+				end: 'bottom 20%',
 				scrub: 0.7,
-				pin: true,
-				anticipatePin: 1,
 				animation: timeline,
 				onToggle: makeEnter(onEnter),
 			});
 		});
 	});
 
-	// Reduced motion: no pinning, no scrub — the DOM is already the end state,
+	// Reduced motion: no scroll-linked animation — the DOM is already the end state,
 	// so honour each scene with a plain rail acknowledgement instead.
 	mm.add('(prefers-reduced-motion: reduce)', () => {
 		nodes.forEach(({ scene, stage }) => wireRail(scene, stage, 'top 65%'));
@@ -319,14 +316,14 @@ export function initManifesto(): void {
 
 	// The rail moves forward as we move through the manifesto; it is the one
 	// "decoration" that is state, so it updates even under reduced motion.
-	// Scenes that pin are built inside `gsap.matchMedia()`, which reverts and
-	// rebuilds them if the motion preference changes mid-session.
+	// Scroll timelines are built inside `gsap.matchMedia()`, which reverts
+	// and rebuilds them if the motion preference changes mid-session.
 	buildMotion(nodes);
 
 	initChallenge();
 
 	refreshAfterFonts();
-	// Some scenes pin; make sure offsets are correct on first paint.
+	// Recalculate scroll positions after the page's first layout.
 	requestAnimationFrame(() => ScrollTrigger.refresh());
 }
 

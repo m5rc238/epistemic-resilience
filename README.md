@@ -74,12 +74,12 @@ state, so if JavaScript fails or is blocked the content is simply visible —
 animations get cancelled, content does not. Nothing is hidden by CSS.
 
 Each manifesto scene is one full-viewport panel whose DOM *is* its end state.
-Under supported conditions each panel is pinned for one viewport of scroll and
-a timeline scrubs between a calmer opening and that end state ("growth →
-maturity").
+Under supported conditions scenes stay in normal document flow while a
+timeline scrubs between a calmer opening and that end state ("growth →
+maturity"). This avoids pin spacers and keeps scroll measurements stable.
 
 `prefers-reduced-motion: reduce` skips the animation and renders the final
-state. Verified in-browser, not assumed. Motion is gated through
+state. Motion is gated through
 `gsap.matchMedia()`.
 
 `standalone/` is a deliberate simplification of the same content without the
