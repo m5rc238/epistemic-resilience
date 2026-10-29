@@ -128,7 +128,9 @@
 
 /* Tone doors — border-left colour says what kind of thing this is. */
 .sys-node--claim { border-block-start: 2px solid var(--color-charcoal); }
-.sys-node--evidence { border-block-start: 2px solid var(--color-accent-strong); }
+.sys-node--evidence,
+.sys-node--new-evidence { border-block-start: 2px solid var(--color-accent-strong); }
+.sys-node--interpretation { border-block-start: 2px solid var(--color-slate); }
 .sys-node--assumption { border-block-start: 2px solid var(--color-slate); }
 .sys-node--reasoning { border-block-start: 2px solid var(--color-muted); }
 .sys-node--uncertainty { border-block-start: 2px solid color-mix(in oklch, var(--color-accent) 75%, var(--color-charcoal) 25%); }
