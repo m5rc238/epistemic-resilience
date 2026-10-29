@@ -1,17 +1,15 @@
 ---
 import SysScene from './SysScene.astro';
 
-/** The final scene. Six phases of the system become a single closed loop —
- *  the outcome is new evidence. Rendered as nodes on a ring with a persistent
- *  arrow; the whole ring drifts slowly (CSS, killed under reduce-motion),
- *  but nothing here loops as a cheesy spinner — it simply *is* a loop. */
+/** Six phases form a cycle: outcomes become new evidence. The nodes stay
+ *  fixed around a circle, while the explanatory copy sits below it. */
 const ring = [
-	{ kind: 'evidence', label: 'Evidence', top: '0%', left: '50%' },
-	{ kind: 'interpretation', label: 'Interpretation', top: '25%', left: '97%' },
-	{ kind: 'decision', label: 'Decision', top: '75%', left: '97%' },
-	{ kind: 'action', label: 'Action', top: '100%', left: '50%' },
-	{ kind: 'outcome', label: 'Outcome', top: '75%', left: '3%' },
-	{ kind: 'new evidence', label: 'New evidence', top: '25%', left: '3%' },
+	{ kind: 'evidence', label: 'Evidence', top: '10.7%', left: '50%' },
+	{ kind: 'interpretation', label: 'Interpretation', top: '30%', left: '84%' },
+	{ kind: 'decision', label: 'Decision', top: '70%', left: '84%' },
+	{ kind: 'action', label: 'Action', top: '89.3%', left: '50%' },
+	{ kind: 'outcome', label: 'Outcome', top: '70%', left: '16%' },
+	{ kind: 'new-evidence', label: 'New evidence', top: '30%', left: '16%' },
 ];
 ---
 
@@ -28,16 +26,9 @@ const ring = [
 			aria-hidden="true"
 		>
 			<circle cx="150" cy="150" r="118" stroke="var(--color-line)" stroke-dasharray="2 5" />
-			<path
-				d="M 150 150 L 268 150"
-				stroke="var(--color-accent-strong)"
-				stroke-width="1"
-			/>
-			{/* direction arrow */}
-			<path d="M 268 150 L 256 143 M 268 150 L 256 157" stroke="var(--color-accent-strong)" stroke-width="1.5" />
 		</svg>
 
-		<div class="sys-loop__rotate" data-sys-loop-rotate>
+		<div class="sys-loop__nodes">
 			{
 				ring.map((n) => (
 					<div
@@ -49,10 +40,10 @@ const ring = [
 				))
 			}
 		</div>
+	</div>
 
-		<div class="sys-loop__center">
-			<span class="sys-node__label">A system that stays connected</span>
-			<p>wrong can surface, decisions can be reconstructed, and the loop can turn again.</p>
-		</div>
+	<div class="sys-loop__center">
+		<span class="sys-node__label">Correction stays possible</span>
+		<p>Errors can surface, decisions can be reconstructed, and outcomes can guide the next cycle.</p>
 	</div>
 </SysScene>
