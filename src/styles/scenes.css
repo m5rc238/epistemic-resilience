@@ -759,25 +759,14 @@
 	color: var(--color-body);
 }
 
-/* The scene panels are full-viewport, so they leave the column and span the
-   whole viewport. `margin-inline` is the negative implied by a centered parent;
-   common window sizes keep it in range and `overflow-x: clip` on the body below
-   guards the one or two pixels a scrollbar would otherwise create. */
+/* Keep scenes in the same centered reading frame as the manifesto.
+   Viewport-width breakouts conflict with ScrollTrigger's pin spacer: the
+   spacer inherits the article's width while the pinned child forces 100vw,
+   shifting content horizontally and causing jumps during pin/unpin. */
 .m-prose > .sys-scene {
-	width: 100vw;
+	width: 100%;
 	max-inline-size: none;
-	margin-inline: calc(50% - 50vw);
-}
-
-/* ScrollTrigger reparents each pinned scene into a `.pin-spacer` and writes
-   inline width/max-width onto the scene for the duration of the pin. Re-assert
-   the full-bleed break-out there too, so the scene is 100vw pinned, unpinned,
-   and with JS disabled alike. While fixed the percentage in `calc(50% - 50vw)`
-   resolves against the viewport, so the margin is 0 and it centres itself. */
-.m-prose .sys-scene {
-	width: 100vw !important;
-	max-inline-size: none !important;
-	margin-inline: calc(50% - 50vw) !important;
+	margin-inline: auto;
 }
 
 body {
