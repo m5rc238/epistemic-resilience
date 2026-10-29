@@ -631,7 +631,7 @@
    below the diagram so neither text nor nodes overlap the center. */
 .sys-loop {
 	position: relative;
-	width: min(30rem, 92vw);
+	width: min(30rem, 100%);
 	aspect-ratio: 1;
 	margin-inline: auto;
 }
